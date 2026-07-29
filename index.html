@@ -1,11 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh‑CN">
 <head>
-<meta charset="utf-8">
-<title>方案B测试网页</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial‑scale=1.0">
+<title>石头剪刀布</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui}
+body{max-width:450px;margin:40px auto;padding:0 20px;text-align:center}
+button{padding:12px 20px;margin:6px;font-size:16px;border:none;border-radius:8px;background:#2563eb;color:white;cursor:pointer}
+button:hover{background:#1d4ed8}
+#result{margin-top:24px;font-size:18px}
+</style>
 </head>
 <body>
-<h1>方案B部署成功！</h1>
-<p>网页地址末尾带仓库名字</p>
+<h1>石头 剪刀 布</h1>
+<p>请选择：</p>
+<div>
+  <button onclick="play('石头')">石头</button>
+  <button onclick="play('剪刀')">剪刀</button>
+  <button onclick="play('布')">布</button>
+</div>
+<div id="result"></div>
+
+<script>
+function play(user){
+  const arr=["石头","剪刀","布"];
+  const computer=arr[Math.floor(Math.random()*3)];
+  let msg;
+  if(user===computer){
+    msg=`你出：${user}，电脑出：${computer} → 平局！`;
+  }else if(
+    (user==="石头"&&computer==="剪刀")||
+    (user==="剪刀"&&computer==="布")||
+    (user==="布"&&computer==="石头")
+  ){
+    msg=`你出：${user}，电脑出：${computer} → 你赢了🎉`;
+  }else{
+    msg=`你出：${user}，电脑出：${computer} → 你输了😥`;
+  }
+  document.getElementById("result").innerText=msg;
+}
+</script>
 </body>
 </html>
