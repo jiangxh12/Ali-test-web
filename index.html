@@ -1,30 +1,62 @@
 <!DOCTYPE html>
-<html lang="zh‑CN">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial‑scale=1.0">
-<title>石头剪刀布</title>
-<style>
-*{box-sizing:border-box;font-family:system-ui}
-body{max-width:450px;margin:40px auto;padding:0 20px;text-align:center}
-button{padding:12px 20px;margin:6px;font-size:16px;border:none;border-radius:8px;background:#2563eb;color:white;cursor:pointer}
-button:hover{background:#1d4ed8}
-#result{margin-top:24px;font-size:18px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和事佬 · AI矛盾调解与裁决系统 PeaceMaker AI</title>
+    <!-- Ant Design CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@4.24.13/dist/antd.min.css">
+    <!-- ECharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- Jquery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<h1>石头 剪刀 布</h1>
-<p>请选择：</p>
-<div>
-  <button onclick="play('石头')">石头</button>
-  <button onclick="play('剪刀')">剪刀</button>
-  <button onclick="play('布')">布</button>
-</div>
-<div id="result"></div>
+<div class="container">
+    <header class="page-header">
+        <h1>⚖ 和事佬 · AI矛盾调解与裁决系统</h1>
+        <p class="slogan">先讲情，再讲理；情理化纠纷，一秒定分止争。</p>
+    </header>
 
-<script>
-function play(user){
-  const arr=["石头","剪刀","布"];
+    <div class="case-buttons">
+        <button class="ant-btn ant-btn-primary case-btn" data-preset="case_01">📦 外卖撒漏</button>
+        <button class="ant-btn ant-btn-primary case-btn" data-preset="case_02">📦 仅退款</button>
+        <button class="ant-btn ant-btn-primary case-btn" data-preset="case_03">😤 态度差</button>
+    </div>
+
+    <div class="input-block">
+        <textarea id="inputText" class="ant-input" rows="6" placeholder="粘贴双方纠纷聊天记录，格式参考：
+甲：我点的外卖汤全洒了！你们怎么送的？必须退款！
+乙：骑手说路上颠簸没办法，而且你已经签收了……"></textarea>
+        <div class="btn-wrap">
+            <button id="analyzeBtn" class="ant-btn ant-btn-success">⚖ 一键分析</button>
+            <button id="clearBtn" class="ant-btn ant-btn-default">清空内容</button>
+        </div>
+    </div>
+
+    <div id="resultWrap" class="result-wrap" style="display:none;">
+        <div class="row">
+            <div class="chart-col">
+                <div id="emotionChart" class="chart-box"></div>
+                <div id="faultGauge" class="chart-box"></div>
+            </div>
+            <div class="report-col">
+                <div class="mode-badge-wrap">
+                    <span id="modeBadge" class="mode-badge"></span>
+                </div>
+                <div id="severityTip" class="severity-warning" style="display:none;"></div>
+                <div id="credibilityNoteBox" class="note-box"></div>
+                <div id="reportContent" class="report-content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
   const computer=arr[Math.floor(Math.random()*3)];
   let msg;
   if(user===computer){
