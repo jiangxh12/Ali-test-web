@@ -1,1373 +1,1071 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>和事佬 · PeaceMaker AI</title>
-    <!-- ECharts CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
     <style>
-/* ═══════════════════════════════════════════════════════════
-   和事佬 · PeaceMaker AI - 自定义样式
-   ═══════════════════════════════════════════════════════════ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-                 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 24px 16px;
-}
-.container {
-    max-width: 1100px;
-    margin: 0 auto;
-}
-/* ── 顶部标题区 ── */
-.header {
-    text-align: center;
-    margin-bottom: 28px;
-}
-.title {
-    font-size: 2.2rem;
-    color: #fff;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    margin-bottom: 8px;
-}
-.slogan {
-    font-size: 1.05rem;
-    color: rgba(255, 255, 255, 0.85);
-    font-style: italic;
-}
-/* ── 预设案例按钮 ── */
-.preset-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-.preset-label {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-}
-.preset-btn {
-    padding: 8px 18px;
-    border: 2px solid rgba(255, 255, 255, 0.7);
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    backdrop-filter: blur(4px);
-}
-.preset-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.preset-btn:active {
-    transform: translateY(0);
-}
-/* ── 输入区 ── */
-.input-section {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    margin-bottom: 24px;
-}
-.dispute-textarea {
-    width: 100%;
-    min-height: 140px;
-    padding: 14px 16px;
-    border: 2px solid #e8e8e8;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    line-height: 1.7;
-    resize: vertical;
-    transition: border-color 0.3s;
-    font-family: inherit;
-}
-.dispute-textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-.analyze-btn {
-    display: block;
-    margin: 16px auto 0;
-    padding: 12px 40px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
-    border: none;
-    border-radius: 25px;
-    font-size: 1.05rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-}
-.analyze-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-}
-.analyze-btn:active {
-    transform: translateY(0);
-}
-.analyze-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-/* ── 加载状态 ── */
-.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 30px;
-    color: #fff;
-    font-size: 1rem;
-}
-.spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-/* ── 结果展示区 ── */
-.result-section {
-    animation: fadeInUp 0.5s ease;
-}
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-.badge-row {
-    text-align: center;
-    margin-bottom: 16px;
-}
-.mode-badge {
-    display: inline-block;
-    padding: 6px 20px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-.mode-badge.mediator {
-    background: #f6ffed;
-    color: #52c41a;
-    border: 1px solid #b7eb8f;
-}
-.mode-badge.judge {
-    background: #fff2f0;
-    color: #ff4d4f;
-    border: 1px solid #ffccc7;
-}
-.mode-badge.insufficient {
-    background: #fafafa;
-    color: #8c8c8c;
-    border: 1px solid #d9d9d9;
-}
-/* ── 黄色警告条 ── */
-.severity-bar {
-    background: #fffbe6;
-    border: 1px solid #ffe58f;
-    border-left: 4px solid #faad14;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    color: #ad6800;
-    font-size: 0.9rem;
-    line-height: 1.6;
-}
-/* ── 左右两栏布局 ── */
-.result-columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-}
-@media (max-width: 768px) {
-    .result-columns {
-        grid-template-columns: 1fr;
-    }
-}
-/* ── 图表卡片 ── */
-.chart-column {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-.chart-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-.chart-card h3 {
-    font-size: 0.95rem;
-    color: #333;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0;
-}
-.chart-box {
-    width: 100%;
-    height: 220px;
-}
-/* ── 报告卡片 ── */
-.report-column {
-    display: flex;
-    flex-direction: column;
-}
-.report-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 22px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-/* ── 可信度批注 ── */
-.credibility-note {
-    background: #fff7e6;
-    border: 1px solid #ffd591;
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 14px;
-    font-size: 0.85rem;
-    color: #ad6800;
-}
-.credibility-note::before {
-    content: '\26A0\FE0F ';
-}
-/* ── 分数概览 ── */
-.score-overview {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-.score-item {
-    background: #fafafa;
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
-}
-.score-item .label {
-    font-size: 0.8rem;
-    color: #8c8c8c;
-    margin-bottom: 4px;
-}
-.score-item .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-.score-item .value.high-fault {
-    color: #ff4d4f;
-}
-.score-item .value.low-fault {
-    color: #52c41a;
-}
-/* ── 裁定书 / 调解建议 ── */
-.verdict-block {
-    background: #f9f9f9;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 16px;
-    border-left: 4px solid #667eea;
-}
-.verdict-block.judge-style {
-    border-left-color: #ff4d4f;
-    background: #fff8f8;
-}
-.verdict-block h4 {
-    font-size: 0.9rem;
-    color: #333;
-    margin-bottom: 8px;
-}
-.verdict-block p,
-.verdict-block pre {
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 1.8;
-    white-space: pre-wrap;
-    font-family: inherit;
-}
-/* ── AI 分析语 ── */
-.reason-block {
-    margin-top: 8px;
-}
-.reason-block h4 {
-    font-size: 0.9rem;
-    color: #333;
-    margin-bottom: 8px;
-}
-.reason-block p {
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 1.8;
-}
-/* ── insufficient 提示 ── */
-.insufficient-msg {
-    text-align: center;
-    padding: 30px 20px;
-    color: #8c8c8c;
-    font-size: 1rem;
-    line-height: 1.8;
-}
-.insufficient-msg::before {
-    content: '\1F4AD';
-    display: block;
-    font-size: 2rem;
-    margin-bottom: 12px;
-}
-/* ── 通用隐藏 ── */
-.hidden {
-    display: none !important;
-}
-/* ── 胜方高亮 ── */
-.winner-highlight {
-    color: #52c41a;
-    font-weight: 700;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            padding: 24px;
+            color: #1a1a2e;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px 40px 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #1a1a2e;
+        }
+        .header h1 span { color: #e74c3c; }
+        .header .sub {
+            color: #888;
+            font-size: 16px;
+            margin-top: 6px;
+            letter-spacing: 2px;
+        }
+        .header .sub strong { color: #e67e22; font-weight: 600; }
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+        .clear-btn {
+            padding: 6px 18px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            background: #fafafa;
+            color: #999;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .clear-btn:hover {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            background: #fff5f5;
+        }
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .input-area textarea {
+            width: 100%;
+            height: 170px;
+            padding: 16px 18px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.7;
+            resize: vertical;
+            transition: border 0.25s, box-shadow 0.25s;
+            font-family: inherit;
+            color: #1a1a2e;
+            background: #fafbfc;
+        }
+        .input-area textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.08);
+            background: #ffffff;
+        }
+        .input-area textarea::placeholder { color: #b0b0b0; }
+        .action-row { display: flex; justify-content: flex-end; }
+        .analyze-btn {
+            padding: 12px 52px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 14px rgba(231, 76, 60, 0.30);
+            letter-spacing: 1px;
+        }
+        .analyze-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.35);
+        }
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .result-area {
+            margin-top: 28px;
+            border-top: 2px solid #f0f2f5;
+            padding-top: 24px;
+        }
+        .result-placeholder {
+            text-align: center;
+            color: #bbb;
+            padding: 48px 0 32px;
+            font-size: 15px;
+        }
+        .result-placeholder span {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+        @media (max-width: 820px) {
+            .result-grid { grid-template-columns: 1fr; }
+            .container { padding: 20px 16px; }
+        }
+        .chart-box {
+            background: #fafbfc;
+            border-radius: 16px;
+            padding: 18px 16px 16px;
+            border: 1px solid #efefef;
+        }
+        .chart-box h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        .chart-container { width: 100%; height: 200px; }
+        .chart-container + .chart-container { margin-top: 20px; }
+        .report-box {
+            background: #fafbfc;
+            border-radius: 16px;
+            padding: 20px 22px;
+            border: 1px solid #efefef;
+        }
+        .mode-badge {
+            display: inline-block;
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+        .badge-mediator { background: #e8f5e9; color: #2e7d32; }
+        .badge-judge { background: #e3f2fd; color: #0d47a1; }
+        .badge-insufficient { background: #f5f5f5; color: #888; }
+        .score-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 16px;
+            padding: 10px 0;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #f0f0f0;
+        }
+        .score-item {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+        .score-item .num { font-weight: 700; font-size: 22px; }
+        .reason-text {
+            color: #2d3436;
+            font-size: 14px;
+            line-height: 1.8;
+            margin: 12px 0 14px;
+            padding: 14px 16px;
+            background: #ffffff;
+            border-radius: 10px;
+            border-left: 4px solid #74b9ff;
+        }
+        .suggestion-text {
+            background: #ffffff;
+            padding: 16px 18px;
+            border-radius: 10px;
+            margin: 12px 0;
+            border-left: 4px solid #f39c12;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .warning-hint {
+            background: #fff8e1;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-top: 12px;
+            color: #856404;
+            font-size: 14px;
+        }
+        .verdict-report {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin: 12px 0;
+            border-left: 4px solid #1565C0;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 14px;
+            color: #2d3436;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+        }
+        .liability-tag {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border: 1px solid #90caf9;
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+        .liability-tag strong { color: #0d47a1; }
+        .insufficient-box {
+            padding: 20px;
+            background: #fff8e1;
+            border-radius: 10px;
+            color: #e65100;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .footer {
+            text-align: center;
+            color: #ccc;
+            font-size: 12px;
+            margin-top: 40px;
+            border-top: 1px solid #f5f5f5;
+            padding-top: 20px;
+            letter-spacing: 0.5px;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 顶部标题区 -->
-        <header class="header">
-            <h1 class="title">&#9878;&#65039; 和事佬 · PeaceMaker AI</h1>
-            <p class="slogan">先讲情，再讲理；情理化纠纷，一秒定分止争。</p>
-        </header>
-        <!-- 预设案例按钮 -->
-        <section class="preset-section">
-            <span class="preset-label">快速体验：</span>
-            <button class="preset-btn" data-preset="case_01">&#128230; 外卖撒漏</button>
-            <button class="preset-btn" data-preset="case_02">&#128230; 仅退款</button>
-            <button class="preset-btn" data-preset="case_03">&#128548; 态度差</button>
-        </section>
-        <!-- 输入区 -->
-        <section class="input-section">
-            <textarea id="dispute-input" class="dispute-textarea"
-                placeholder="请粘贴双方的聊天记录或投诉内容...&#10;&#10;示例：&#10;甲：我点的外卖汤全洒了！你们怎么送的？必须退款！&#10;乙：骑手说路上颠簸没办法，而且你已经签收了……"></textarea>
-            <button id="analyze-btn" class="analyze-btn">&#9878;&#65039; 一键分析</button>
-        </section>
-        <!-- 加载状态 -->
-        <div id="loading" class="loading hidden">
-            <div class="spinner"></div>
-            <span>正在分析纠纷...</span>
+        <div class="header">
+            <h1>⚖️ 和事佬 · <span>PeaceMaker</span> AI</h1>
+            <div class="sub">先讲情，再讲理 · 情理化纠纷，一秒定分止争</div>
         </div>
-        <!-- 结果展示区 -->
-        <section id="result-section" class="result-section hidden">
-            <!-- 模式徽章 -->
-            <div class="badge-row">
-                <span id="mode-badge" class="mode-badge"></span>
+        <div class="toolbar">
+            <button class="clear-btn" id="clearBtn">🗑️ 清空</button>
+        </div>
+        <div class="input-area">
+            <textarea id="inputText" placeholder="请把双方的争执聊天记录粘贴到这里…&#10;例如：&#10;甲（消费者）：我收到的商品有质量问题，要求退货。&#10;乙（商家）：亲，商品是完好的，不影响使用，不退货。"></textarea>
+            <div class="action-row">
+                <button class="analyze-btn" id="analyzeBtn">⚖️ 一键分析</button>
             </div>
-            <!-- 黄色警告条（severity_hint） -->
-            <div id="severity-bar" class="severity-bar hidden"></div>
-            <div class="result-columns">
-                <!-- 左栏：图表 -->
-                <div class="chart-column">
-                    <div class="chart-card">
-                        <h3>&#128202; 情绪激烈度对比</h3>
-                        <div id="emotion-chart" class="chart-box"></div>
+        </div>
+        <div class="result-area" id="resultArea">
+            <div class="result-placeholder" id="placeholder">
+                <span>💡</span>
+                输入纠纷内容，点击"一键分析"获取诊断报告
+            </div>
+            <div id="resultContent" style="display:none;">
+                <div class="result-grid">
+                    <div class="chart-box">
+                        <h3>📊 情绪激烈度对比</h3>
+                        <div id="emotionChart" class="chart-container"></div>
+                        <h3 style="margin-top:22px;">📊 责任权重对比</h3>
+                        <div id="faultChart" class="chart-container"></div>
                     </div>
-                    <div class="chart-card">
-                        <h3>&#9878;&#65039; 责任权重仪表盘</h3>
-                        <div id="fault-chart" class="chart-box"></div>
-                    </div>
-                </div>
-                <!-- 右栏：诊断报告 -->
-                <div class="report-column">
-                    <div class="report-card">
-                        <!-- 可信度批注 -->
-                        <div id="credibility-note" class="credibility-note hidden"></div>
-                        <!-- 分数概览 -->
-                        <div id="score-overview" class="score-overview"></div>
-                        <!-- 调解建议 / 裁定书 -->
-                        <div id="verdict-block" class="verdict-block hidden"></div>
-                        <!-- AI 分析语 -->
-                        <div id="reason-block" class="reason-block">
-                            <h4>&#129302; AI 分析</h4>
-                            <p id="reason-text"></p>
-                        </div>
-                        <!-- insufficient 提示 -->
-                        <div id="insufficient-msg" class="insufficient-msg hidden"></div>
-                    </div>
+                    <div class="report-box" id="reportBox"></div>
                 </div>
             </div>
-        </section>
+        </div>
+        <div class="footer">
+            和事佬 · PeaceMaker AI · 纯前端静态版
+        </div>
     </div>
 
     <script>
-// ═══════════════════════════════════════════════════════════
-// 和事佬 · PeaceMaker AI - 规则引擎（JavaScript 版）
-// 从 Python Flask 后端移植，纯前端运行
-// ═══════════════════════════════════════════════════════════
-
-// ── 预设案例黄金 JSON ──
-var PRESET_CASES = {
-    'case_01': {
-        'mode': 'mediator',
-        'fault_score': {'party_a': 55, 'party_b': 37},
-        'gap': 18,
-        'emotion_intensity': {'party_a': 80, 'party_b': 20},
-        'credibility_note': {'party_a': null, 'party_b': null},
-        'compromise_suggestion': '建议商家向用户致歉并赠送一张5元无门槛优惠券，用户接受配送途中的客观颠簸因素，双方互谅互让。',
-        'severity_hint': null,
-        'winner': null,
-        'verdict': null,
-        'reason': '本次纠纷主要源于配送途中的客观颠簸，商家出餐合规且已尽到包装义务，用户情绪激动但诉求合理。系统建议以补偿代问责，维护客情关系。',
-        'party_labels': {'party_a': '消费者（买家）', 'party_b': '商家/骑手'},
-        'message': null
-    },
-    'case_02': {
-        'mode': 'judge',
-        'fault_score': {'party_a': 10, 'party_b': 80},
-        'gap': 70,
-        'emotion_intensity': {'party_a': 30, 'party_b': 20},
-        'credibility_note': {'party_a': null, 'party_b': null},
-        'compromise_suggestion': null,
-        'severity_hint': null,
-        'winner': 'party_a',
-        'verdict': '【裁定书】\n经审核，乙方（商家）存在以下违规行为：\n1. 商品与描述严重不符，违反平台商品信息发布规范；\n2. 拒绝提供有效售后凭证，违反消费者权益保障规则。\n裁定：支持甲方退款诉求，乙方须在48小时内完成退款。',
-        'reason': '乙方提供的商品存在明显质量问题，且未能提供合规的售后处理证明。甲方证据充分，诉求合理。',
-        'party_labels': {'party_a': '消费者（买家）', 'party_b': '商家（卖家）'},
-        'message': null
-    },
-    'case_03': {
-        'mode': 'mediator',
-        'fault_score': {'party_a': 60, 'party_b': 35},
-        'gap': 25,
-        'emotion_intensity': {'party_a': 90, 'party_b': 45},
-        'credibility_note': {'party_a': '该方情绪表达激烈，但缺乏事实支撑', 'party_b': null},
-        'compromise_suggestion': '建议甲方整理具体证据后再进行申诉，乙方应就客服态度问题向甲方致歉。',
-        'severity_hint': '乙方需注意：客服态度恶劣已接近平台服务红线，若再次发生类似投诉，将触发违约判定。',
-        'winner': null,
-        'verdict': null,
-        'reason': '本次纠纷主要集中在沟通态度方面，甲方情绪激化但事实依据不足，乙方服务话术有改进空间。建议双方以理性沟通为主，避免情绪升级。',
-        'party_labels': {'party_a': '消费者（买家）', 'party_b': '商家客服'},
-        'message': null
-    }
-};
-
-// ── 关键词库与权重配置 ──
-var PARTY_A_LEANING_WORDS = {
-    '空包': 10, '假货': 10, '欺诈': 10, '虚假': 9,
-    '退款': 5, '投诉': 5, '质量问题': 8, '货不对板': 9, '缺斤少两': 8,
-    '过期': 8, '变质': 8, '异物': 9, '食品安全': 9, '三无产品': 10,
-    '虚假宣传': 9, '售后不理': 7, '拒绝退款': 8, '强制消费': 9,
-    '洒了': 6, '撒漏': 6, '破损': 6, '少了': 5, '漏发': 7,
-    '发错': 7, '色差': 5, '开线': 6, '掉色': 6, '褪色': 6,
-    '差评': 4, '举报': 5, '维权': 5, '315': 7, '消协': 7,
-    '赔偿': 5, '道歉': 4, '态度恶劣': 8, '辱骂': 9, '威胁': 8
-};
-
-var PARTY_B_LEANING_WORDS = {
-    '已签收': 8, '不影响使用': 7, '活动解释权': 7, '正常损耗': 7,
-    '已提前告知': 8, '用户确认': 7, '按约履行': 8, '合规包装': 7,
-    '客观原因': 6, '不可抗力': 7, '天气原因': 6, '交通拥堵': 5,
-    '已联系客户': 6, '主动补偿': 6, '已处理': 5, '已解决': 5,
-    '平台规则': 6, '超过时限': 7, '无凭证': 7, '恶意退款': 9,
-    '仅退款': 8, '白嫖': 8, '已使用': 6, '人为损坏': 8,
-    '超出范围': 6, '非质量问题': 7, '个人原因': 6, '不喜欢': 5,
-    '已尽告知义务': 8, '配送合规': 7, '出餐正常': 7,
-    '差评威胁': 10, '威胁差评': 10, '不退货': 8, '只退款不退货': 10,
-    '恶意仅退款': 10, '薅羊毛': 9, '占便宜': 8, '无理取闹': 9,
-    '恶意索赔': 10, '敲诈': 10, '恶意评价': 9, '要挟': 9
-};
-
-var EMOTION_WORDS = {
-    '垃圾': 15, '太差': 15, '恶心': 15, '离谱': 12, '无语': 10,
-    '绝对': 10, '肯定': 8, '必须': 8, '一定': 8, '简直': 10,
-    '太离谱': 15, '太过分': 15, '气死': 15, '呵呵': 12,
-    '骗子': 18, '黑心': 18, '无良': 15, '坑人': 12, '不要脸': 20,
-    '投诉到底': 15, '告你': 15, '曝光': 12, '退钱': 10,
-    '什么破': 12, '什么垃圾': 15, '太恶心': 15, '忍不了': 12,
-    '崩溃': 10, '抓狂': 12, '疯了': 12, '醉了': 8, '服了': 8
-};
-
-var FACT_PATTERNS = [
-    /\d+元/g, /\d+块钱/g, /\d{10,}/g, /\d{1,2}:\d{2}/g,
-    /[一二三四五六七八九十百千万]?[\d]*个月?/g,
-    /[一二三四五六七八九十百千万]?[\d]*周/g,
-    /[一二三四五六七八九十百千万]?[\d]*天/g,
-    /[一二三四五六七八九十百千万]?[\d]*小时/g,
-    /[一二三四五六七八九十百千万]?[\d]*分钟/g,
-    /[一二三四五六七八九十百千万]?[\d]*次/g,
-    /[一二三四五六七八九十百千万]?[\d]*回/g,
-    /[一二三四五六七八九十百千万]?[\d]*件/g,
-    /[一二三四五六七八九十百千万]?[\d]*条/g,
-    /[一二三四五六七八九十百千万]?[\d]*个/g,
-    /\d{1,2}月\d{1,2}日/g,
-    /\d{1,2}月/g,
-    /截图/g, /物流/g, /签收/g, /客服/g, /订单/g,
-    /快递/g, /发货/g, /退货/g, /退款/g, /凭证/g,
-    /聊天记录/g, /录音/g, /视频/g, /照片/g, /发票/g,
-    /单号/g, /运单/g, /配送/g, /下单时间/g,
-    /详情页/g, /规则/g, /平台/g, /投诉/g, /赔偿/g,
-    /早上/g, /晚上/g, /昨天/g, /今天/g, /前天/g,
-    /穿了/g, /用了/g, /洗了/g, /买了/g, /收到/g, /拆开/g, /试穿/g,
-    /试了/g, /退了/g, /换了/g, /联系了/g, /申请了/g
-];
-
-// ── 话术模板库 ──
-var MEDIATOR_REASON_TEMPLATES = [
-    '本次争执中，{label_a}与{label_b}均存在明显情绪化表达，双方焦虑与不满交织。' +
-    '从事实维度看，双方过错程度接近（分差仅{gap}分），属于典型的各执一词型矛盾。' +
-    '系统认为，此次纠纷的根源不在于谁对谁错，而在于沟通方式失当。' +
-    '建议双方先平复情绪，再就具体诉求进行理性协商。',
-    '经系统分析，{label_a}与{label_b}的核心分歧在于对责任边界的认知差异。' +
-    '双方表达均较为理性，事实陈述基本清晰。分差{gap}分表明存在一定程度的责任倾斜，' +
-    '但尚未达到需要强制裁决的阈值。建议以互谅互让为原则，通过协商解决。',
-    '本次纠纷中，{high_emotion_label}情绪表达较为激烈，而{low_emotion_label}相对克制。' +
-    '从过错分来看，双方分差为{gap}分，责任归属尚存争议空间。' +
-    '系统建议情绪激动一方先梳理核心诉求，理性一方适当展现诚意，' +
-    '双方在事实基础上寻找最大公约数。',
-    '系统检测到本次纠纷分差为{gap}分，已接近调解与裁决的临界线。' +
-    '{label_a}与{label_b}之间的责任天平出现了较为明显的倾斜。' +
-    '虽然当前仍适用调解程序，但若{higher_fault_label}不能正视自身问题，' +
-    '后续可能面临更为严格的违约判定。建议把握调解窗口，尽快达成共识。',
-    '本次纠纷属于典型的互有过失型矛盾。{label_a}在{a_issue}方面存在不足，' +
-    '而{label_b}在{b_issue}方面同样有待改进。分差{gap}分说明双方责任大致对等。' +
-    '系统建议双方各退一步，以补偿代问责，共同维护良好的交易关系。'
-];
-
-var JUDGE_REASON_TEMPLATES = [
-    '经系统综合研判，{loser_label}在本次交易中存在明显违规行为，过错分高达{loser_score}分。' +
-    '具体表现为：{key_issues}。' +
-    '相比之下，{winner_label}的诉求合理且有据可依，过错分仅为{winner_score}分。' +
-    '分差{gap}分已远超裁决阈值，系统依法作出裁定。',
-    '本次纠纷事实清晰，{loser_label}的失职行为证据充分。' +
-    '过错分对比（{winner_score} vs {loser_score}）显示责任归属明确，' +
-    '分差达{gap}分。{winner_label}作为守约方，其合法权益应予保障。' +
-    '系统裁定支持{winner_label}的合理诉求。',
-    '系统检测到{loser_label}存在主观恶意或严重过失行为，过错分{loser_score}分。' +
-    '相关证据指向：{key_issues}。' +
-    '此行为已严重违反平台交易规范，{winner_label}的维权诉求完全正当。' +
-    '分差{gap}分，系统作出有利于{winner_label}的终局裁定。'
-];
-
-var COMPROMISE_TEMPLATES = [
-    '建议{higher_fault_label}向对方表达诚挚歉意，并给予适当经济补偿（如优惠券，红包等），' +
-    '另一方接受客观因素的存在，双方互谅互让，握手言和。',
-    '建议双方各退一步：{higher_fault_label}主动承担主要责任并提供补偿方案，' +
-    '{lower_fault_label}适当降低诉求预期。以和为贵，维护长期信任关系。',
-    '建议{higher_fault_label}在24小时内提出具体补偿方案（退款，换货，优惠券三选一），' +
-    '{lower_fault_label}给予合理响应时间。若协商不成，可申请平台介入。',
-    '鉴于双方分差较小，建议以善意推定为原则：{higher_fault_label}做出象征性补偿，' +
-    '{lower_fault_label}不再追究。一次愉快的和解胜过十次投诉。'
-];
-
-var VERDICT_TEMPLATES = [
-    '【裁定书】\n经审核，{loser_label}存在以下违规行为：\n' +
-    '1. {issue_1}；\n2. {issue_2}。\n' +
-    '裁定：支持{winner_label}的合理诉求，{loser_label}须在48小时内履行补偿义务。',
-    '【裁定书】\n经审理查明，{loser_label}在本次交易中的行为已构成违约：\n' +
-    '1. {issue_1}；\n2. {issue_2}。\n' +
-    '依据平台消费者权益保障规则，裁定{winner_label}胜诉，' +
-    '{loser_label}须立即执行退款或等价补偿。',
-    '【裁定书】\n本系统综合双方陈述及证据，认定：\n' +
-    '1. {issue_1}；\n2. {issue_2}。\n' +
-    '过错分对比悬殊（{winner_score} vs {loser_score}），责任归属明确。' +
-    '裁定支持{winner_label}全部合理诉求。'
-];
-
-var SEVERITY_HINT_TEMPLATES = [
-    '{higher_fault_label}需注意：当前过错分已接近裁决红线，若后续再发生类似投诉，' +
-    '系统将自动升级为判官模式并可能作出违约判定。',
-    '警告：{higher_fault_label}的行为已处于平台服务规范的灰色地带。' +
-    '本次仍适用调解，但请务必整改，否则下次将面临直接裁决。',
-    '系统提示：分差已达{gap}分，距离强制裁决仅一步之遥。' +
-    '建议{higher_fault_label}高度重视本次调解机会，积极改正。'
-];
-
-var FALLBACK_REASON =
-    '经系统综合分析，本次纠纷双方各执一词，现有信息尚不足以做出精确的责任划分。' +
-    '从整体表述来看，双方均有一定道理，也存在各自的不足。' +
-    '建议双方本着互谅互让的精神，通过友好协商解决分歧，必要时可申请平台客服介入调解。';
-
-var FALLBACK_COMPROMISE =
-    '建议双方先冷静下来，各自梳理核心诉求和可接受的底线，' +
-    '然后选择一个双方都认可的时间进行坦诚沟通。' +
-    '如果自行协商困难，可以申请平台官方客服作为第三方介入调解。';
-
-// ── 工具函数 ──
-function countOccurrences(text, word) {
-    if (!text || !word) return 0;
-    var count = 0;
-    var pos = 0;
-    while ((pos = text.indexOf(word, pos)) !== -1) {
-        count++;
-        pos += word.length;
-    }
-    return count;
-}
-
-function formatTemplate(template, vars) {
-    return template.replace(/\{(\w+)\}/g, function(match, key) {
-        return vars[key] !== undefined ? vars[key] : match;
-    });
-}
-
-// ── 核心分析函数 ──
-
-function splitParties(text) {
-    var partyAText = '';
-    var partyBText = '';
-    // 模式1：甲：... 乙：...
-    var patternAB = text.split(/[乙B]方?[：:]/);
-    if (patternAB.length >= 2) {
-        partyAText = patternAB[0].replace(/^[甲A]方?[：:]?\s*/, '').trim();
-        partyBText = patternAB.slice(1).join('').trim();
-    } else {
-        // 模式2：买家：... 卖家：...
-        var patternBS = text.split(/(?:卖家|商家|骑手|客服)[：:]/);
-        if (patternBS.length >= 2) {
-            partyAText = patternBS[0].replace(/^(?:买家|消费者|用户|顾客)[：:]?\s*/, '').trim();
-            partyBText = patternBS.slice(1).join('').trim();
-        } else {
-            partyAText = text.trim();
-            partyBText = '';
-        }
-    }
-    return [partyAText, partyBText];
-}
-
-function calcFactDensity(text) {
-    if (!text || text.length === 0) return 0.0;
-    var totalChars = text.replace(/ /g, '').replace(/\n/g, '').length;
-    if (totalChars === 0) return 0.0;
-    var factChars = 0;
-    for (var i = 0; i < FACT_PATTERNS.length; i++) {
-        var pattern = FACT_PATTERNS[i];
-        pattern.lastIndex = 0;
-        var matches = text.match(pattern);
-        if (matches) {
-            for (var j = 0; j < matches.length; j++) {
-                factChars += matches[j].length;
-            }
-        }
-    }
-    // 额外统计关键词库中的词
-    var allKeywords = {};
-    for (var w in PARTY_A_LEANING_WORDS) allKeywords[w] = true;
-    for (var w2 in PARTY_B_LEANING_WORDS) allKeywords[w2] = true;
-    for (var w3 in EMOTION_WORDS) allKeywords[w3] = true;
-    for (var word in allKeywords) {
-        var cnt = countOccurrences(text, word);
-        factChars += word.length * cnt;
-    }
-    return factChars / totalChars;
-}
-
-function calcEmotionIntensity(text) {
-    if (!text) return 0;
-    var score = 0;
-    var hasExtremeWord = false;
-    var hasIntensePunctuation = false;
-    // 情绪词命中
-    for (var word in EMOTION_WORDS) {
-        var count = countOccurrences(text, word);
-        score += count * EMOTION_WORDS[word];
-    }
-    // 极端程度副词
-    var extremeAdverbs = ['根本', '绝对', '简直', '完全', '压根', '从来', '永远不'];
-    for (var i = 0; i < extremeAdverbs.length; i++) {
-        if (text.indexOf(extremeAdverbs[i]) !== -1) {
-            hasExtremeWord = true;
-            score += 12;
-        }
-    }
-    // 感叹号密度
-    var exclamationCount = countOccurrences(text, '！') + countOccurrences(text, '!');
-    score += exclamationCount * 5;
-    // 连续感叹号
-    var multiExcl = text.match(/[！!]{2,}/g);
-    if (multiExcl) {
-        hasIntensePunctuation = true;
-        score += multiExcl.length * 15;
-    }
-    // 问号连用
-    var multiQuestion = text.match(/[？?]{2,}/g);
-    if (multiQuestion) {
-        hasIntensePunctuation = true;
-        score += multiQuestion.length * 10;
-    }
-    // 翻倍机制
-    if (hasExtremeWord && hasIntensePunctuation) {
-        score = Math.floor(score * 2);
-    }
-    // 全大写
-    var capsWords = text.match(/[A-Z]{3,}/g);
-    if (capsWords) {
-        score += capsWords.length * 5;
-    }
-    return Math.min(score, 100);
-}
-
-function calcFaultScore(partyAText, partyBText) {
-    var faultA = 50;
-    var faultB = 50;
-    // 甲方倾向词 → 乙方过错分增加
-    for (var word in PARTY_A_LEANING_WORDS) {
-        var weight = PARTY_A_LEANING_WORDS[word];
-        var countA = countOccurrences(partyAText, word);
-        faultB += countA * weight;
-        var countB = countOccurrences(partyBText, word);
-        faultB += Math.floor(countB * weight * 0.5);
-    }
-    // 乙方倾向词 → 甲方过错分增加
-    for (var word2 in PARTY_B_LEANING_WORDS) {
-        var weight2 = PARTY_B_LEANING_WORDS[word2];
-        var countB2 = countOccurrences(partyBText, word2);
-        faultA += countB2 * weight2;
-        var countA2 = countOccurrences(partyAText, word2);
-        faultA += Math.floor(countA2 * weight2 * 0.5);
-    }
-    // 情绪惩罚
-    var emotionA = calcEmotionIntensity(partyAText);
-    var emotionB = calcEmotionIntensity(partyBText);
-    var densityA = calcFactDensity(partyAText);
-    var densityB = calcFactDensity(partyBText);
-    if (emotionA >= 70 && densityA < 0.05) {
-        faultA += 5;
-    }
-    if (emotionB >= 70 && densityB < 0.05) {
-        faultB += 5;
-    }
-    // 限制范围
-    faultA = Math.max(5, Math.min(95, faultA));
-    faultB = Math.max(5, Math.min(95, faultB));
-    return [faultA, faultB];
-}
-
-function detectPartyLabels(partyAText, partyBText) {
-    var fullText = partyAText + partyBText;
-    var labelA = '消费者（买家）';
-    var labelB = '商家（卖家）';
-    if (fullText.indexOf('骑手') !== -1 || fullText.indexOf('配送') !== -1 || fullText.indexOf('外卖') !== -1) {
-        labelB = '商家/骑手';
-    }
-    if (fullText.indexOf('客服') !== -1 && fullText.indexOf('态度') !== -1) {
-        labelB = '商家客服';
-    }
-    return [labelA, labelB];
-}
-
-function extractKeyIssues(partyAText, partyBText, faultA, faultB) {
-    var issues = [];
-    if (faultB > faultA) {
-        var wordsA = ['质量问题', '假货', '虚假宣传', '货不对板', '拒绝退款',
-                     '态度恶劣', '售后不理', '食品安全', '破损', '洒了',
-                     '缺斤少两', '过期', '变质', '异物'];
-        for (var i = 0; i < wordsA.length; i++) {
-            if (partyAText.indexOf(wordsA[i]) !== -1) {
-                issues.push(wordsA[i]);
-            }
-        }
-    } else {
-        var wordsB = ['恶意退款', '仅退款', '已签收', '人为损坏',
-                     '无凭证', '超过时限', '非质量问题'];
-        for (var j = 0; j < wordsB.length; j++) {
-            if (partyBText.indexOf(wordsB[j]) !== -1) {
-                issues.push(wordsB[j]);
-            }
-        }
-    }
-    if (issues.length === 0) {
-        issues = ['未能充分履行交易义务', '沟通处理不当'];
-    }
-    return issues.slice(0, 3);
-}
-
-function selectTemplate(templates, indexSeed) {
-    return templates[indexSeed % templates.length];
-}
-
-function generateReason(mode, gap, emotionA, emotionB, faultA, faultB,
-                        labelA, labelB, partyAText, partyBText) {
-    var issues = extractKeyIssues(partyAText, partyBText, faultA, faultB);
-    var keyIssuesStr = issues.length > 0 ? issues.join('，') : '履约不当';
-    var seed = (gap + emotionA + emotionB + faultA + faultB) % 100;
-    var template;
-
-    if (mode === 'mediator') {
-        if (emotionA >= 70 && emotionB >= 70 && gap <= 15) {
-            template = MEDIATOR_REASON_TEMPLATES[0];
-        } else if (emotionA < 50 && emotionB < 50 && gap > 15) {
-            template = MEDIATOR_REASON_TEMPLATES[1];
-        } else if (Math.abs(emotionA - emotionB) >= 40) {
-            template = MEDIATOR_REASON_TEMPLATES[2];
-        } else if (gap > 20) {
-            template = MEDIATOR_REASON_TEMPLATES[3];
-        } else if (faultA >= 40 && faultB >= 40) {
-            template = MEDIATOR_REASON_TEMPLATES[4];
-        } else {
-            template = selectTemplate(MEDIATOR_REASON_TEMPLATES, seed);
-        }
-        var highEmotionLabel = emotionA >= emotionB ? labelA : labelB;
-        var lowEmotionLabel = emotionA >= emotionB ? labelB : labelA;
-        var higherFaultLabel = faultA >= faultB ? labelA : labelB;
-        var aIssue = '';
-        if (faultA >= 50 || (emotionA >= 70 && calcFactDensity(partyAText) < 0.08)) {
-            aIssue = '诉求表达过于情绪化';
-        } else {
-            aIssue = '部分诉求缺乏充分依据';
-        }
-        var bIssue = '';
-        if (faultB >= 50) {
-            bIssue = '服务响应不够及时';
-        } else {
-            bIssue = '售后处理有待改进';
-        }
-        return formatTemplate(template, {
-            label_a: labelA,
-            label_b: labelB,
-            gap: gap,
-            high_emotion_label: highEmotionLabel,
-            low_emotion_label: lowEmotionLabel,
-            higher_fault_label: higherFaultLabel,
-            a_issue: aIssue,
-            b_issue: bIssue
-        });
-    } else {
-        var winnerLabel, loserLabel, winnerScore, loserScore;
-        if (faultB > faultA) {
-            winnerLabel = labelA;
-            loserLabel = labelB;
-            winnerScore = faultA;
-            loserScore = faultB;
-        } else {
-            winnerLabel = labelB;
-            loserLabel = labelA;
-            winnerScore = faultB;
-            loserScore = faultA;
-        }
-        if (loserScore >= 75) {
-            template = JUDGE_REASON_TEMPLATES[2];
-        } else if (gap >= 50) {
-            template = JUDGE_REASON_TEMPLATES[0];
-        } else {
-            template = selectTemplate(JUDGE_REASON_TEMPLATES, seed);
-        }
-        return formatTemplate(template, {
-            winner_label: winnerLabel,
-            loser_label: loserLabel,
-            winner_score: winnerScore,
-            loser_score: loserScore,
-            gap: gap,
-            key_issues: keyIssuesStr
-        });
-    }
-}
-
-function generateCompromise(gap, faultA, faultB, labelA, labelB) {
-    var seed = (gap + faultA + faultB) % 100;
-    var template = selectTemplate(COMPROMISE_TEMPLATES, seed);
-    var higherFaultLabel = faultA >= faultB ? labelA : labelB;
-    var lowerFaultLabel = faultA >= faultB ? labelB : labelA;
-    return formatTemplate(template, {
-        higher_fault_label: higherFaultLabel,
-        lower_fault_label: lowerFaultLabel
-    });
-}
-
-function generateVerdict(faultA, faultB, labelA, labelB, partyAText, partyBText) {
-    var seed = (faultA + faultB) % 100;
-    var template = selectTemplate(VERDICT_TEMPLATES, seed);
-    var winnerLabel, loserLabel, winnerScore, loserScore;
-    if (faultB > faultA) {
-        winnerLabel = labelA;
-        loserLabel = labelB;
-        winnerScore = faultA;
-        loserScore = faultB;
-    } else {
-        winnerLabel = labelB;
-        loserLabel = labelA;
-        winnerScore = faultB;
-        loserScore = faultA;
-    }
-    var issues = extractKeyIssues(partyAText, partyBText, faultA, faultB);
-    var issue1 = issues.length > 0 ? issues[0] : '未能履行交易义务';
-    var issue2 = issues.length > 1 ? issues[1] : '售后处理不当';
-    return formatTemplate(template, {
-        winner_label: winnerLabel,
-        loser_label: loserLabel,
-        winner_score: winnerScore,
-        loser_score: loserScore,
-        issue_1: issue1,
-        issue_2: issue2
-    });
-}
-
-function generateSeverityHint(gap, faultA, faultB, labelA, labelB) {
-    var seed = (gap + faultA) % 100;
-    var template = selectTemplate(SEVERITY_HINT_TEMPLATES, seed);
-    var higherFaultLabel = faultA >= faultB ? labelA : labelB;
-    return formatTemplate(template, {
-        higher_fault_label: higherFaultLabel,
-        gap: gap
-    });
-}
-
-function buildInsufficient(message) {
-    return {
-        success: true,
-        data: {
-            mode: 'insufficient',
-            fault_score: null,
-            gap: null,
-            emotion_intensity: null,
-            credibility_note: null,
-            compromise_suggestion: null,
+    // ═══════════════════════════════════════════════════════════
+    // 预设案例黄金 JSON
+    // ═══════════════════════════════════════════════════════════
+    const PRESET_CASES = {
+        'case_01': {
+            mode: 'mediator',
+            fault_score: { party_a: 55, party_b: 37 },
+            gap: 18,
+            emotion_intensity: { party_a: 80, party_b: 20 },
+            credibility_note: { party_a: null, party_b: null },
+            compromise_suggestion: '建议商家向用户致歉并赠送一张5元无门槛优惠券，用户接受配送途中的客观颠簸因素，双方互谅互让。',
             severity_hint: null,
             winner: null,
             verdict: null,
-            reason: null,
-            party_labels: null,
-            message: message
-        }
-    };
-}
-
-function analyzeText(text) {
-    // insufficient 检查 1：文本为空或过短
-    if (!text || text.trim().length < 10) {
-        return buildInsufficient(
-            '还没有看到纠纷描述哦，请把双方的聊天记录或投诉内容粘贴进来。'
-        );
-    }
-    // insufficient 检查 2：纯符号/乱码/无关内容
-    var cleaned = text.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
-    if (cleaned.length < 5) {
-        return buildInsufficient(
-            '信息似乎跑偏了，请重新描述一下双方的争执焦点哦。'
-        );
-    }
-    // 纯重复字符检测
-    var uniqueChars = {};
-    for (var i = 0; i < cleaned.length; i++) {
-        uniqueChars[cleaned[i]] = true;
-    }
-    var uniqueCount = 0;
-    for (var k in uniqueChars) uniqueCount++;
-    if (uniqueCount <= 2 && cleaned.length > 0) {
-        return buildInsufficient(
-            '信息似乎跑偏了，请重新描述一下双方的争执焦点哦。'
-        );
-    }
-    // insufficient 检查 3：事实密度极低
-    var density = calcFactDensity(text);
-    if (density < 0.001) {
-        return buildInsufficient(
-            '信息似乎跑偏了，请重新描述一下双方的争执焦点哦。'
-        );
-    }
-    // 正式分析流程
-    var parties = splitParties(text);
-    var partyAText = parties[0];
-    var partyBText = parties[1];
-
-    var faults = calcFaultScore(partyAText, partyBText);
-    var faultA = faults[0];
-    var faultB = faults[1];
-    var emotionA = calcEmotionIntensity(partyAText);
-    var emotionB = calcEmotionIntensity(partyBText);
-    var gap = Math.abs(faultA - faultB);
-
-    var labels = detectPartyLabels(partyAText, partyBText);
-    var labelA = labels[0];
-    var labelB = labels[1];
-
-    // 模式判定
-    var mode = gap > 30 ? 'judge' : 'mediator';
-
-    // 可信度批注
-    var credibilityA = null;
-    var credibilityB = null;
-    if (emotionA >= 70 && faultA <= 20) {
-        credibilityA = '该方情绪表达激烈，但缺乏事实支撑';
-    }
-    if (emotionB >= 70 && faultB <= 20) {
-        credibilityB = '该方情绪表达激烈，但缺乏事实支撑';
-    }
-
-    // 生成文案
-    var reason = generateReason(
-        mode, gap, emotionA, emotionB, faultA, faultB,
-        labelA, labelB, partyAText, partyBText
-    );
-
-    // 关键词命中极少时使用兜底
-    var totalKeywordHits = 0;
-    for (var w in PARTY_A_LEANING_WORDS) {
-        totalKeywordHits += countOccurrences(text, w);
-    }
-    for (var w2 in PARTY_B_LEANING_WORDS) {
-        totalKeywordHits += countOccurrences(text, w2);
-    }
-    if (totalKeywordHits <= 1) {
-        reason = FALLBACK_REASON;
-    }
-
-    var compromiseSuggestion = null;
-    var severityHint = null;
-    var winner = null;
-    var verdict = null;
-
-    if (mode === 'mediator') {
-        compromiseSuggestion = generateCompromise(gap, faultA, faultB, labelA, labelB);
-        if (totalKeywordHits <= 1) {
-            compromiseSuggestion = FALLBACK_COMPROMISE;
-        }
-        if (gap > 20 && gap <= 30) {
-            severityHint = generateSeverityHint(gap, faultA, faultB, labelA, labelB);
-        }
-    } else {
-        winner = faultB > faultA ? 'party_a' : 'party_b';
-        verdict = generateVerdict(faultA, faultB, labelA, labelB, partyAText, partyBText);
-    }
-
-    return {
-        success: true,
-        data: {
-            mode: mode,
-            fault_score: { party_a: faultA, party_b: faultB },
-            gap: gap,
-            emotion_intensity: { party_a: emotionA, party_b: emotionB },
-            credibility_note: { party_a: credibilityA, party_b: credibilityB },
-            compromise_suggestion: compromiseSuggestion,
-            severity_hint: severityHint,
-            winner: winner,
-            verdict: verdict,
-            reason: reason,
-            party_labels: { party_a: labelA, party_b: labelB },
+            reason: '本次纠纷主要源于配送途中的客观颠簸，商家出餐合规且已尽到包装义务，用户情绪激动但诉求合理。系统建议以补偿代问责，维护客情关系。',
+            party_labels: { party_a: '消费者（买家）', party_b: '商家/骑手' },
+            message: null
+        },
+        'case_02': {
+            mode: 'judge',
+            fault_score: { party_a: 10, party_b: 80 },
+            gap: 70,
+            emotion_intensity: { party_a: 30, party_b: 20 },
+            credibility_note: { party_a: null, party_b: null },
+            compromise_suggestion: null,
+            severity_hint: null,
+            winner: 'party_a',
+            verdict: '【裁定书】\n经审核，乙方（商家）存在以下违规行为：\n1. 商品与描述严重不符，违反平台商品信息发布规范；\n2. 拒绝提供有效售后凭证，违反消费者权益保障规则。\n裁定：支持甲方退款诉求，乙方须在48小时内完成退款。',
+            reason: '乙方提供的商品存在明显质量问题，且未能提供合规的售后处理证明。甲方证据充分，诉求合理。',
+            party_labels: { party_a: '消费者（买家）', party_b: '商家（卖家）' },
+            message: null
+        },
+        'case_03': {
+            mode: 'mediator',
+            fault_score: { party_a: 60, party_b: 35 },
+            gap: 25,
+            emotion_intensity: { party_a: 90, party_b: 45 },
+            credibility_note: { party_a: '该方情绪表达激烈，但缺乏事实支撑', party_b: null },
+            compromise_suggestion: '建议甲方整理具体证据后再进行申诉，乙方应就客服态度问题向甲方致歉。',
+            severity_hint: '乙方需注意：客服态度恶劣已接近平台服务红线，若再次发生类似投诉，将触发违约判定。',
+            winner: null,
+            verdict: null,
+            reason: '本次纠纷主要集中在沟通态度方面，甲方情绪激化但事实依据不足，乙方服务话术有改进空间。建议双方以理性沟通为主，避免情绪升级。',
+            party_labels: { party_a: '消费者（买家）', party_b: '商家客服' },
             message: null
         }
     };
-}
 
-// ── 主 API 入口（替代原 /api/analyze） ──
-function apiAnalyze(body) {
-    var preset = body.preset;
-    var text = body.text;
-    if (preset && PRESET_CASES[preset]) {
-        return {
-            success: true,
-            data: PRESET_CASES[preset]
-        };
+    // ═══════════════════════════════════════════════════════════
+    // 关键词库与权重配置
+    // ═══════════════════════════════════════════════════════════
+    const PARTY_A_LEANING_WORDS = {
+        '空包': 10, '假货': 10, '欺诈': 10, '虚假': 9, '退款': 5,
+        '投诉': 5, '质量问题': 8, '货不对板': 9, '缺斤少两': 8,
+        '过期': 8, '变质': 8, '异物': 9, '食品安全': 9, '三无产品': 10,
+        '虚假宣传': 9, '售后不理': 7, '拒绝退款': 8, '强制消费': 9,
+        '洒了': 6, '撒漏': 6, '破损': 6, '少了': 5, '漏发': 7,
+        '发错': 7, '色差': 5, '开线': 6, '掉色': 6, '褪色': 6,
+        '差评': 4, '举报': 5, '维权': 5, '315': 7, '消协': 7,
+        '赔偿': 5, '道歉': 4, '态度恶劣': 8, '辱骂': 9, '威胁': 8
+    };
+
+    const PARTY_B_LEANING_WORDS = {
+        '已签收': 8, '不影响使用': 7, '活动解释权': 7, '正常损耗': 7,
+        '已提前告知': 8, '用户确认': 7, '按约履行': 8, '合规包装': 7,
+        '客观原因': 6, '不可抗力': 7, '天气原因': 6, '交通拥堵': 5,
+        '已联系客户': 6, '主动补偿': 6, '已处理': 5, '已解决': 5,
+        '平台规则': 6, '超过时限': 7, '无凭证': 7, '恶意退款': 9,
+        '仅退款': 8, '白嫖': 8, '已使用': 6, '人为损坏': 8,
+        '超出范围': 6, '非质量问题': 7, '个人原因': 6, '不喜欢': 5,
+        '已尽告知义务': 8, '配送合规': 7, '出餐正常': 7,
+        '差评威胁': 10, '威胁差评': 10, '不退货': 8, '只退款不退货': 10,
+        '恶意仅退款': 10, '薅羊毛': 9, '占便宜': 8, '无理取闹': 9,
+        '恶意索赔': 10, '敲诈': 10, '恶意评价': 9, '要挟': 9
+    };
+
+    const EMOTION_WORDS = {
+        '垃圾': 15, '太差': 15, '恶心': 15, '离谱': 12, '无语': 10,
+        '绝对': 10, '肯定': 8, '必须': 8, '一定': 8, '简直': 10,
+        '太离谱': 15, '太过分': 15, '气死': 15, '呵呵': 12,
+        '骗子': 18, '黑心': 18, '无良': 15, '坑人': 12, '不要脸': 20,
+        '投诉到底': 15, '告你': 15, '曝光': 12, '差评': 8, '退钱': 10,
+        '什么破': 12, '什么垃圾': 15, '太恶心': 15, '忍不了': 12,
+        '崩溃': 10, '抓狂': 12, '疯了': 12, '醉了': 8, '服了': 8
+    };
+
+    const FACT_PATTERNS = [
+        /\d+元/g, /\d+块钱/g, /\d{10,}/g, /\d{1,2}:\d{2}/g,
+        /[一二三四五六七八九十百千万]?[\d]*个月?/g,
+        /[一二三四五六七八九十百千万]?[\d]*周/g,
+        /[一二三四五六七八九十百千万]?[\d]*天/g,
+        /[一二三四五六七八九十百千万]?[\d]*小时/g,
+        /[一二三四五六七八九十百千万]?[\d]*分钟/g,
+        /[一二三四五六七八九十百千万]?[\d]*次/g,
+        /[一二三四五六七八九十百千万]?[\d]*回/g,
+        /[一二三四五六七八九十百千万]?[\d]*件/g,
+        /[一二三四五六七八九十百千万]?[\d]*条/g,
+        /[一二三四五六七八九十百千万]?[\d]*个/g,
+        /\d{1,2}月\d{1,2}日/g,
+        /\d{1,2}月/g,
+        '截图', '物流', '签收', '客服', '订单',
+        '快递', '发货', '退货', '退款', '凭证',
+        '聊天记录', '录音', '视频', '照片', '发票',
+        '单号', '运单', '配送', '下单时间',
+        '详情页', '规则', '平台', '投诉', '赔偿',
+        '早上', '晚上', '昨天', '今天', '前天',
+        '穿了', '用了', '洗了', '买了', '收到', '拆开', '试穿',
+        '试了', '退了', '换了', '联系了', '申请了'
+    ];
+
+    // ═══════════════════════════════════════════════════════════
+    // 话术模板
+    // ═══════════════════════════════════════════════════════════
+    const COMPROMISE_TEMPLATES = [
+        '建议{higher_fault_label}向对方表达诚挚歉意，并给予适当经济补偿（如优惠券，红包等），另一方接受客观因素的存在，双方互谅互让，握手言和。',
+        '建议双方各退一步：{higher_fault_label}主动承担主要责任并提供补偿方案，{lower_fault_label}适当降低诉求预期。以和为贵，维护长期信任关系。',
+        '建议{higher_fault_label}在24小时内提出具体补偿方案（退款，换货，优惠券三选一），{lower_fault_label}给予合理响应时间。若协商不成，可申请平台介入。',
+        '鉴于双方分差较小，建议以善意推定为原则：{higher_fault_label}做出象征性补偿，{lower_fault_label}不再追究。一次愉快的和解胜过十次投诉。'
+    ];
+
+    const SEVERITY_HINT_TEMPLATES = [
+        '{higher_fault_label}需注意：当前过错分已接近裁决红线，若后续再发生类似投诉，系统将自动升级为判官模式并可能作出违约判定。',
+        '警告：{higher_fault_label}的行为已处于平台服务规范的灰色地带。本次仍适用调解，但请务必整改，否则下次将面临直接裁决。',
+        '系统提示：分差已达{gap}分，距离强制裁决仅一步之遥。建议{higher_fault_label}高度重视本次调解机会，积极改正。'
+    ];
+
+    const FALLBACK_REASON = (
+        '经系统综合分析，本次纠纷双方各执一词，现有信息尚不足以做出精确的责任划分。' +
+        '从整体表述来看，双方均有一定道理，也存在各自的不足。' +
+        '建议双方本着互谅互让的精神，通过友好协商解决分歧，必要时可申请平台客服介入调解。'
+    );
+
+    const FALLBACK_COMPROMISE = (
+        '建议双方先冷静下来，各自梳理核心诉求和可接受的底线，' +
+        '然后选择一个双方都认可的时间进行坦诚沟通。' +
+        '如果自行协商困难，可以申请平台官方客服作为第三方介入调解。'
+    );
+
+    // ═══════════════════════════════════════════════════════════
+    // 核心函数
+    // ═══════════════════════════════════════════════════════════
+    function splitParties(text) {
+        let partyAText = '';
+        let partyBText = '';
+        const patternAB = text.split(/[乙B]方?[：:]/);
+        if (patternAB.length >= 2) {
+            partyAText = patternAB[0].replace(/^[甲A]方?[：:]?\s*/, '').trim();
+            partyBText = patternAB.slice(1).join('').trim();
+        } else {
+            const patternBS = text.split(/(?:卖家|商家|骑手|客服)[：:]/);
+            if (patternBS.length >= 2) {
+                partyAText = patternBS[0].replace(/^(?:买家|消费者|用户|顾客)[：:]?\s*/, '').trim();
+                partyBText = patternBS.slice(1).join('').trim();
+            } else {
+                partyAText = text.trim();
+                partyBText = '';
+            }
+        }
+        return [partyAText, partyBText];
     }
-    if (!text && !preset) {
-        return buildInsufficient(
-            '还没有看到纠纷描述哦，请把双方的聊天记录或投诉内容粘贴进来。'
+
+    function calcFactDensity(text) {
+        if (!text || text.length === 0) return 0.0;
+        const totalChars = text.replace(/ /g, '').replace(/\n/g, '').length;
+        if (totalChars === 0) return 0.0;
+        let factChars = 0;
+        for (const pattern of FACT_PATTERNS) {
+            if (pattern instanceof RegExp) {
+                const matches = text.match(pattern);
+                if (matches) {
+                    for (const m of matches) {
+                        factChars += m.length;
+                    }
+                }
+            } else {
+                const count = (text.match(new RegExp(pattern, 'g')) || []).length;
+                factChars += pattern.length * count;
+            }
+        }
+        const allKeywords = new Set([
+            ...Object.keys(PARTY_A_LEANING_WORDS),
+            ...Object.keys(PARTY_B_LEANING_WORDS),
+            ...Object.keys(EMOTION_WORDS)
+        ]);
+        for (const word of allKeywords) {
+            const count = (text.match(new RegExp(word, 'g')) || []).length;
+            factChars += word.length * count;
+        }
+        return factChars / totalChars;
+    }
+
+    function calcEmotionIntensity(text) {
+        if (!text) return 0;
+        let score = 0;
+        let hasExtremeWord = false;
+        let hasIntensePunctuation = false;
+        for (const [word, weight] of Object.entries(EMOTION_WORDS)) {
+            const count = (text.match(new RegExp(word, 'g')) || []).length;
+            score += count * weight;
+        }
+        const extremeAdverbs = ['根本', '绝对', '简直', '完全', '压根', '从来', '永远不'];
+        for (const adv of extremeAdverbs) {
+            if (text.includes(adv)) {
+                hasExtremeWord = true;
+                score += 12;
+            }
+        }
+        const exclamationCount = (text.match(/[！!]/g) || []).length;
+        score += exclamationCount * 5;
+        const multiExcl = text.match(/[！!]{2,}/g);
+        if (multiExcl) {
+            hasIntensePunctuation = true;
+            score += multiExcl.length * 15;
+        }
+        const multiQuestion = text.match(/[？?]{2,}/g);
+        if (multiQuestion) {
+            hasIntensePunctuation = true;
+            score += multiQuestion.length * 10;
+        }
+        if (hasExtremeWord && hasIntensePunctuation) {
+            score = Math.floor(score * 2);
+        }
+        const capsWords = text.match(/[A-Z]{3,}/g);
+        if (capsWords) {
+            score += capsWords.length * 5;
+        }
+        return Math.min(score, 100);
+    }
+
+    function calcFaultScore(partyAText, partyBText) {
+        let faultA = 30;
+        let faultB = 30;
+
+        // 判断谁先引发纠纷
+        if (['送错', '发错', '漏发', '破损', '质量问题'].some(kw => partyBText.includes(kw))) {
+            faultB += 20;
+            faultA -= 10;
+            if (partyAText.includes('差评') && partyAText.includes('威胁')) {
+                faultA += 10;
+            }
+        }
+
+        // 消费者（甲方）减分项
+        if (['开箱视频', '截图', '照片', '录像', '录音', '聊天记录', '物流记录'].some(kw => partyAText.includes(kw))) {
+            faultA -= 20;
+        }
+        if (['三包', '七天无理由', '消费者权益', '平台规则', '法律规定'].some(kw => partyAText.includes(kw))) {
+            faultA -= 15;
+        }
+        if (['退货', '退款', '换货', '维修'].some(kw => partyAText.includes(kw)) &&
+            !['一个月', '两个月', '穿过了', '洗了'].some(kw => partyAText.includes(kw))) {
+            faultA -= 10;
+        }
+        if (['请', '谢谢', '理解', '麻烦'].some(kw => partyAText.includes(kw))) {
+            faultA -= 5;
+        }
+
+        // 消费者（甲方）加分项
+        if (partyAText.includes('仅退款') && partyAText.includes('不退货')) {
+            faultA += 30;
+        }
+        if (partyAText.includes('差评') && partyAText.includes('威胁')) {
+            faultA += 25;
+        }
+        if (partyAText.includes('曝光')) {
+            faultA += 20;
+        }
+        if (partyAText.includes('投诉') && partyAText.includes('工商')) {
+            faultA += 15;
+        }
+        if (['一个月', '两个月', '穿了', '洗了', '用了'].some(kw => partyAText.includes(kw))) {
+            faultA += 20;
+        }
+        const emotionA = calcEmotionIntensity(partyAText);
+        const densityA = calcFactDensity(partyAText);
+        if (emotionA >= 70 && densityA < 0.05) {
+            faultA += 10;
+        }
+
+        // 商家（乙方）减分项
+        if (['详情页', '平台规则', '退换货周期', '签收后不支持'].some(kw => partyBText.includes(kw))) {
+            faultB -= 15;
+        }
+        if (['补偿', '优惠券', '部分退款', '换货', '维修'].some(kw => partyBText.includes(kw))) {
+            faultB -= 20;
+        }
+        if (['申请平台介入', '走售后流程', '提交证据'].some(kw => partyBText.includes(kw))) {
+            faultB -= 10;
+        }
+
+        // 商家（乙方）加分项
+        if (['找快递', '不关我们事', '不是我们的责任', '厂家'].some(kw => partyBText.includes(kw))) {
+            faultB += 30;
+        }
+        if (['白嫖', '薅羊毛', '占便宜', '找茬', '想占便宜'].some(kw => partyBText.includes(kw))) {
+            faultB += 25;
+        }
+        if (['自付运费', '折旧费', '自己联系', '自己承担'].some(kw => partyBText.includes(kw))) {
+            faultB += 20;
+        }
+        if (['随便投诉', '去告', '不怕', '别废话'].some(kw => partyBText.includes(kw))) {
+            faultB += 25;
+        }
+
+        faultA = Math.max(5, Math.min(95, faultA));
+        faultB = Math.max(5, Math.min(95, faultB));
+        return [faultA, faultB];
+    }
+
+    function detectPartyLabels(partyAText, partyBText) {
+        const fullText = partyAText + partyBText;
+        let labelA = '消费者（买家）';
+        let labelB = '商家（卖家）';
+        if (fullText.includes('骑手') || fullText.includes('配送') || fullText.includes('外卖')) {
+            labelB = '商家/骑手';
+        }
+        if (fullText.includes('客服') && fullText.includes('态度')) {
+            labelB = '商家客服';
+        }
+        return [labelA, labelB];
+    }
+
+    function extractKeyIssues(partyAText, partyBText, faultA, faultB) {
+        const issues = [];
+        if (faultB > faultA) {
+            for (const word of ['质量问题', '假货', '虚假宣传', '货不对板', '拒绝退款',
+                         '态度恶劣', '售后不理', '食品安全', '破损', '洒了',
+                         '缺斤少两', '过期', '变质', '异物']) {
+                if (partyAText.includes(word)) {
+                    issues.push(word);
+                }
+            }
+        } else {
+            for (const word of ['恶意退款', '仅退款', '已签收', '人为损坏',
+                         '无凭证', '超过时限', '非质量问题']) {
+                if (partyBText.includes(word)) {
+                    issues.push(word);
+                }
+            }
+        }
+        if (issues.length === 0) {
+            issues.push('未能充分履行交易义务', '沟通处理不当');
+        }
+        return issues.slice(0, 3);
+    }
+
+    function selectTemplate(templates, indexSeed) {
+        return templates[indexSeed % templates.length];
+    }
+
+    function generateReason(mode, gap, emotionA, emotionB, faultA, faultB, labelA, labelB, partyAText, partyBText) {
+        const issues = extractKeyIssues(partyAText, partyBText, faultA, faultB);
+        const keyIssuesStr = issues.length > 0 ? issues.join('、') : '沟通与履约细节';
+
+        if (mode === 'mediator') {
+            const templates = [
+                `本次纠纷中，${labelA}与${labelB}在${keyIssuesStr}方面存在分歧。从过错分来看，双方责任较为接近（分差仅${gap}分），属于典型的沟通不畅或轻微过失型矛盾。系统建议双方优先以协商方式解决，避免因情绪激化导致争议升级。`,
+                `经系统分析，${labelA}与${labelB}的核心分歧在于对${keyIssuesStr}的认知差异。双方过错分分别为${faultA}和${faultB}，分差${gap}分，表明责任归属尚存争议空间。建议双方基于事实和规则，寻找互利共赢的解决方案。`,
+                `本次纠纷中，${labelA}的诉求与${labelB}的回应在${keyIssuesStr}方面存在一定摩擦。过错分对比为${faultA}:${faultB}，分差${gap}分，未达到明显失衡阈值。系统建议双方以和为贵，通过理性沟通化解分歧。`
+            ];
+            if (emotionA > 70 || emotionB > 70) {
+                return templates[0];
+            } else if (gap > 15) {
+                return templates[1];
+            } else {
+                return templates[2];
+            }
+        } else {
+            let primary, secondary, primaryScore, secondaryScore, primaryRatio;
+            if (faultB > faultA) {
+                primary = labelB;
+                secondary = labelA;
+                primaryScore = faultB;
+                secondaryScore = faultA;
+                primaryRatio = Math.round(faultB / (faultA + faultB) * 100);
+            } else {
+                primary = labelA;
+                secondary = labelB;
+                primaryScore = faultA;
+                secondaryScore = faultB;
+                primaryRatio = Math.round(faultA / (faultA + faultB) * 100);
+            }
+            return (
+                `系统对双方陈述进行了多维度分析，结果显示：\n` +
+                `■ 过错分对比：${labelA} ${faultA}分，${labelB} ${faultB}分，分差${gap}分。\n` +
+                `■ 责任倾向：${primary} 的过错分高于${secondary}，责任倾向相对明显（${primaryRatio}%）。\n` +
+                `■ 关键分歧：集中在${keyIssuesStr}。\n` +
+                `■ 综合判断：本次纠纷中，${primary} 在${keyIssuesStr}方面存在较明显不足，应承担主要责任；${secondary} 亦有部分过失，但程度较轻。\n` +
+                `建议双方正视责任分配，${primary} 主动采取补救措施，${secondary} 给予合理配合，以达成公平解决。`
+            );
+        }
+    }
+
+    function generateCompromise(gap, faultA, faultB, labelA, labelB) {
+        const seed = (gap + faultA + faultB) % 100;
+        const template = selectTemplate(COMPROMISE_TEMPLATES, seed);
+        const higherFaultLabel = faultA >= faultB ? labelA : labelB;
+        const lowerFaultLabel = faultA >= faultB ? labelB : labelA;
+        return template
+            .replace(/{higher_fault_label}/g, higherFaultLabel)
+            .replace(/{lower_fault_label}/g, lowerFaultLabel);
+    }
+
+    function generateVerdict(faultA, faultB, labelA, labelB, partyAText, partyBText) {
+        const total = faultA + faultB;
+        let ratioA, ratioB;
+        if (total === 0) {
+            ratioA = 50;
+            ratioB = 50;
+        } else {
+            ratioA = Math.round(faultA / total * 100);
+            ratioB = 100 - ratioA;
+        }
+
+        let primary, secondary, primaryScore, secondaryScore, primaryRatio, secondaryRatio;
+        if (faultB > faultA) {
+            primary = labelB;
+            secondary = labelA;
+            primaryScore = faultB;
+            secondaryScore = faultA;
+            primaryRatio = ratioB;
+            secondaryRatio = ratioA;
+        } else {
+            primary = labelA;
+            secondary = labelB;
+            primaryScore = faultA;
+            secondaryScore = faultB;
+            primaryRatio = ratioA;
+            secondaryRatio = ratioB;
+        }
+
+        const issues = extractKeyIssues(partyAText, partyBText, faultA, faultB);
+        const issuesStr = issues.length > 0 ? issues.join('；') : '沟通与履约存在瑕疵';
+
+        let tendency, recommendation;
+        if (primaryScore - secondaryScore >= 40) {
+            tendency = '明显';
+            recommendation = `建议${primary}主动承担主要责任，${secondary}予以必要配合。`;
+        } else if (primaryScore - secondaryScore >= 20) {
+            tendency = '较为明显';
+            recommendation = `建议${primary}积极回应，${secondary}保持理性沟通，共同协商解决方案。`;
+        } else {
+            tendency = '轻微';
+            recommendation = '建议双方互谅互让，以补偿代问责，避免争议升级。';
+        }
+
+        return (
+            `【责任认定报告】\n` +
+            `经系统综合评估，本次纠纷中双方均存在一定责任，但责任程度有所不同。\n\n` +
+            `■ 责任倾向分析：\n` +
+            `  • ${primary} 过错分为 ${primaryScore}，占总过错比例的 ${primaryRatio}%；\n` +
+            `  • ${secondary} 过错分为 ${secondaryScore}，占总过错比例的 ${secondaryRatio}%。\n` +
+            `  综合判断，${primary} 的责任倾向 **${tendency}** 更高。\n\n` +
+            `■ 核心争议点：\n` +
+            `  ${issuesStr}\n\n` +
+            `■ 处理建议：\n` +
+            `  ${recommendation}\n` +
+            `  - ${primary} 应就 ${issuesStr} 中的主要部分承担责任；\n` +
+            `  - ${secondary} 亦需审视自身在沟通/履约中的不足。\n\n` +
+            `注：本报告基于双方陈述文本生成，仅供参考，不构成具有法律效力的裁决。`
         );
     }
-    return analyzeText(text || '');
-}
 
-// ═══════════════════════════════════════════════════════════
-// 前端交互逻辑
-// ═══════════════════════════════════════════════════════════
-(function () {
-    'use strict';
-    // ── DOM 引用 ──
-    var inputEl = document.getElementById('dispute-input');
-    var analyzeBtn = document.getElementById('analyze-btn');
-    var loadingEl = document.getElementById('loading');
-    var resultSection = document.getElementById('result-section');
-    var modeBadge = document.getElementById('mode-badge');
-    var severityBar = document.getElementById('severity-bar');
-    var credibilityNote = document.getElementById('credibility-note');
-    var scoreOverview = document.getElementById('score-overview');
-    var verdictBlock = document.getElementById('verdict-block');
-    var reasonBlock = document.getElementById('reason-block');
-    var reasonText = document.getElementById('reason-text');
-    var insufficientMsg = document.getElementById('insufficient-msg');
-    // ECharts 实例
-    var emotionChart = null;
-    var faultChart = null;
-    // ── 预设案例按钮 ──
-    var presetBtns = document.querySelectorAll('.preset-btn');
-    for (var i = 0; i < presetBtns.length; i++) {
-        presetBtns[i].addEventListener('click', function () {
-            var preset = this.getAttribute('data-preset');
-            sendRequest({ preset: preset, text: null });
-        });
+    function generateSeverityHint(gap, faultA, faultB, labelA, labelB) {
+        const seed = (gap + faultA) % 100;
+        const template = selectTemplate(SEVERITY_HINT_TEMPLATES, seed);
+        const higherFaultLabel = faultA >= faultB ? labelA : labelB;
+        return template
+            .replace(/{higher_fault_label}/g, higherFaultLabel)
+            .replace(/{gap}/g, gap);
     }
-    // ── 分析按钮 ──
-    analyzeBtn.addEventListener('click', function () {
-        var text = inputEl.value.trim();
-        sendRequest({ text: text, preset: null });
-    });
-    // Ctrl+Enter 快捷键
-    inputEl.addEventListener('keydown', function (e) {
-        if (e.ctrlKey && e.key === 'Enter') {
-            analyzeBtn.click();
-        }
-    });
-    // ── 发送请求（改为本地调用） ──
-    function sendRequest(body) {
-        // 显示加载状态
-        loadingEl.classList.remove('hidden');
-        resultSection.classList.add('hidden');
-        analyzeBtn.disabled = true;
-        // 模拟异步（让 loading 动画可见）
-        setTimeout(function () {
-            try {
-                var json = apiAnalyze(body);
-                loadingEl.classList.add('hidden');
-                analyzeBtn.disabled = false;
-                if (json.success) {
-                    renderResult(json.data);
-                } else {
-                    alert('分析失败，请重试');
-                }
-            } catch (err) {
-                loadingEl.classList.add('hidden');
-                analyzeBtn.disabled = false;
-                alert('分析错误：' + err.message);
+
+    function buildInsufficient(message) {
+        return {
+            success: true,
+            data: {
+                mode: 'insufficient',
+                fault_score: null,
+                gap: null,
+                emotion_intensity: null,
+                credibility_note: null,
+                compromise_suggestion: null,
+                severity_hint: null,
+                winner: null,
+                verdict: null,
+                reason: null,
+                party_labels: null,
+                message: message
             }
-        }, 600);
+        };
     }
-    // ── 渲染结果 ──
-    function renderResult(data) {
-        resultSection.classList.remove('hidden');
-        // 重置所有区块
-        severityBar.classList.add('hidden');
-        credibilityNote.classList.add('hidden');
-        verdictBlock.classList.add('hidden');
-        reasonBlock.classList.remove('hidden');
-        insufficientMsg.classList.add('hidden');
-        scoreOverview.innerHTML = '';
-        verdictBlock.className = 'verdict-block hidden';
-        // 模式徽章
-        modeBadge.className = 'mode-badge ' + data.mode;
-        if (data.mode === 'mediator') {
-            modeBadge.textContent = '\u2705 调解模式 · 以和为贵';
-        } else if (data.mode === 'judge') {
-            modeBadge.textContent = '\u2696\uFE0F 判官模式 · 明断是非';
-        } else {
-            modeBadge.textContent = '\u2753 信息不足 · 需要补充';
+
+    function analyzeText(text) {
+        if (!text || text.trim().length < 10) {
+            return buildInsufficient('还没有看到纠纷描述哦，请把双方的聊天记录或投诉内容粘贴进来。');
         }
-        // insufficient 模式
-        if (data.mode === 'insufficient') {
-            insufficientMsg.textContent = data.message || '请补充更多信息';
-            insufficientMsg.classList.remove('hidden');
-            reasonBlock.classList.add('hidden');
-            destroyCharts();
+        const cleaned = text.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
+        if (cleaned.length < 5) {
+            return buildInsufficient('信息似乎跑偏了，请重新描述一下双方的争执焦点哦。');
+        }
+        const uniqueChars = new Set(cleaned);
+        if (uniqueChars.size <= 2 && cleaned.length > 0) {
+            return buildInsufficient('信息似乎跑偏了，请重新描述一下双方的争执焦点哦。');
+        }
+
+        const [partyAText, partyBText] = splitParties(text);
+        const [faultA, faultB] = calcFaultScore(partyAText, partyBText);
+        const emotionA = calcEmotionIntensity(partyAText);
+        const emotionB = calcEmotionIntensity(partyBText);
+        const gap = Math.abs(faultA - faultB);
+        const [labelA, labelB] = detectPartyLabels(partyAText, partyBText);
+        const mode = gap > 30 ? 'judge' : 'mediator';
+
+        let credibilityA = null;
+        let credibilityB = null;
+        if (emotionA >= 70 && faultA <= 20) {
+            credibilityA = '该方情绪表达激烈，但缺乏事实支撑';
+        }
+        if (emotionB >= 70 && faultB <= 20) {
+            credibilityB = '该方情绪表达激烈，但缺乏事实支撑';
+        }
+
+        let reason = generateReason(mode, gap, emotionA, emotionB, faultA, faultB, labelA, labelB, partyAText, partyBText);
+
+        const allKeywords = [...Object.keys(PARTY_A_LEANING_WORDS), ...Object.keys(PARTY_B_LEANING_WORDS)];
+        let totalKeywordHits = 0;
+        for (const w of allKeywords) {
+            totalKeywordHits += (text.match(new RegExp(w, 'g')) || []).length;
+        }
+        if (totalKeywordHits <= 1) {
+            reason = FALLBACK_REASON;
+        }
+
+        let compromiseSuggestion = null;
+        let severityHint = null;
+        let winner = null;
+        let verdict = null;
+
+        if (mode === 'mediator') {
+            compromiseSuggestion = generateCompromise(gap, faultA, faultB, labelA, labelB);
+            if (totalKeywordHits <= 1) {
+                compromiseSuggestion = FALLBACK_COMPROMISE;
+            }
+            if (gap > 20 && gap <= 30) {
+                severityHint = generateSeverityHint(gap, faultA, faultB, labelA, labelB);
+            }
+        } else {
+            winner = faultB > faultA ? 'party_a' : 'party_b';
+            verdict = generateVerdict(faultA, faultB, labelA, labelB, partyAText, partyBText);
+        }
+
+        return {
+            success: true,
+            data: {
+                mode: mode,
+                fault_score: { party_a: faultA, party_b: faultB },
+                gap: gap,
+                emotion_intensity: { party_a: emotionA, party_b: emotionB },
+                credibility_note: { party_a: credibilityA, party_b: credibilityB },
+                compromise_suggestion: compromiseSuggestion,
+                severity_hint: severityHint,
+                winner: winner,
+                verdict: verdict,
+                reason: reason,
+                party_labels: { party_a: labelA, party_b: labelB },
+                message: null
+            }
+        };
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 前端交互逻辑
+    // ═══════════════════════════════════════════════════════════
+    const inputText = document.getElementById('inputText');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const placeholder = document.getElementById('placeholder');
+    const resultContent = document.getElementById('resultContent');
+    const reportBox = document.getElementById('reportBox');
+    let emotionChartInstance = null;
+    let faultChartInstance = null;
+
+    clearBtn.addEventListener('click', function() {
+        inputText.value = '';
+    });
+
+    analyzeBtn.addEventListener('click', function() {
+        const text = inputText.value.trim();
+        if (!text) {
+            alert('请先输入纠纷描述内容！');
             return;
         }
-        // ── severity_hint 警告条 ──
-        if (data.severity_hint) {
-            severityBar.textContent = '\u26A0\uFE0F ' + data.severity_hint;
-            severityBar.classList.remove('hidden');
-        }
-        // ── 可信度批注 ──
-        var notes = [];
-        if (data.credibility_note) {
-            if (data.credibility_note.party_a) {
-                notes.push('甲方：' + data.credibility_note.party_a);
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner"></span> 分析中…';
+
+        // 模拟异步分析（实际是同步的，加一点延迟让用户有感知）
+        setTimeout(() => {
+            try {
+                const result = analyzeText(text);
+                if (result.success && result.data) {
+                    renderResult(result.data);
+                } else {
+                    alert('分析失败，请稍后重试');
+                }
+            } catch (err) {
+                alert('分析出错：' + err.message);
+                console.error(err);
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '⚖️ 一键分析';
             }
-            if (data.credibility_note.party_b) {
-                notes.push('乙方：' + data.credibility_note.party_b);
-            }
+        }, 300);
+    });
+
+    function renderResult(data) {
+        placeholder.style.display = 'none';
+        resultContent.style.display = 'block';
+
+        const mode = data.mode;
+        const faultA = data.fault_score?.party_a || 0;
+        const faultB = data.fault_score?.party_b || 0;
+        const emotionA = data.emotion_intensity?.party_a || 0;
+        const emotionB = data.emotion_intensity?.party_b || 0;
+        const gap = data.gap || 0;
+
+        renderCharts(emotionA, emotionB, faultA, faultB);
+
+        let html = '';
+
+        // 模式徽章
+        let badgeClass = 'badge-insufficient';
+        let badgeText = '信息不足';
+        if (mode === 'mediator') {
+            badgeClass = 'badge-mediator';
+            badgeText = '🤝 调解模式';
+        } else if (mode === 'judge') {
+            badgeClass = 'badge-judge';
+            badgeText = '📋 责任认定模式';
         }
-        if (notes.length > 0) {
-            credibilityNote.textContent = notes.join(' | ');
-            credibilityNote.classList.remove('hidden');
+        html += `<div class="mode-badge ${badgeClass}">${badgeText}</div>`;
+
+        // 过错分
+        if (data.fault_score) {
+            html += `<div class="score-display">
+                <div class="score-item"><span style="color:#3498db;">消费者</span><br>过错分 <span class="num" style="color:#3498db;">${faultA}</span></div>
+                <div class="score-item"><span style="color:#e67e22;">商家</span><br>过错分 <span class="num" style="color:#e67e22;">${faultB}</span></div>
+                <div class="score-item">分差 <span class="num" style="color:#e74c3c;">${gap}</span></div>
+            </div>`;
         }
-        // ── 分数概览 ──
-        var labels = data.party_labels || { party_a: '甲方', party_b: '乙方' };
-        var fa = data.fault_score.party_a;
-        var fb = data.fault_score.party_b;
-        scoreOverview.innerHTML =
-            '<div class="score-item">' +
-            '<div class="label">' + labels.party_a + ' 过错分</div>' +
-            '<div class="value ' + (fa >= fb ? 'high-fault' : 'low-fault') + '">' + fa + '</div>' +
-            '</div>' +
-            '<div class="score-item">' +
-            '<div class="label">' + labels.party_b + ' 过错分</div>' +
-            '<div class="value ' + (fb >= fa ? 'high-fault' : 'low-fault') + '">' + fb + '</div>' +
-            '</div>' +
-            '<div class="score-item">' +
-            '<div class="label">分差 (gap)</div>' +
-            '<div class="value">' + data.gap + '</div>' +
-            '</div>' +
-            '<div class="score-item">' +
-            '<div class="label">情绪值 (甲/乙)</div>' +
-            '<div class="value" style="font-size:1.1rem">' +
-            data.emotion_intensity.party_a + ' / ' + data.emotion_intensity.party_b +
-            '</div>' +
-            '</div>';
-        // ── 调解建议 / 裁定书 ──
-        if (data.mode === 'mediator' && data.compromise_suggestion) {
-            verdictBlock.className = 'verdict-block';
-            verdictBlock.innerHTML =
-                '<h4>\u{1F91D} 调解建议</h4>' +
-                '<p>' + escapeHtml(data.compromise_suggestion) + '</p>';
-            verdictBlock.classList.remove('hidden');
-        } else if (data.mode === 'judge' && data.verdict) {
-            verdictBlock.className = 'verdict-block judge-style';
-            var winnerLabel = data.winner === 'party_a' ? labels.party_a : labels.party_b;
-            verdictBlock.innerHTML =
-                '<h4>\u2696\uFE0F 裁决结果 · <span class="winner-highlight">' +
-                escapeHtml(winnerLabel) + ' 胜诉</span></h4>' +
-                '<pre>' + escapeHtml(data.verdict) + '</pre>';
-            verdictBlock.classList.remove('hidden');
-        }
-        // ── AI 分析语 ──
-        if (data.reason) {
-            reasonText.textContent = data.reason;
-            reasonBlock.classList.remove('hidden');
+
+        // 内容
+        if (mode === 'insufficient') {
+            html += `<div class="insufficient-box">${data.message || '信息不足'}</div>`;
         } else {
-            reasonBlock.classList.add('hidden');
+            if (data.reason) {
+                html += `<div class="reason-text">💬 ${data.reason}</div>`;
+            }
+            if (mode === 'mediator') {
+                if (data.compromise_suggestion) {
+                    html += `<div class="suggestion-text">💡 调解建议：${data.compromise_suggestion}</div>`;
+                }
+                if (data.severity_hint) {
+                    html += `<div class="warning-hint">⚠️ ${data.severity_hint}</div>`;
+                }
+            } else if (mode === 'judge') {
+                if (data.verdict) {
+                    let reportText = data.verdict.replace('【裁定书】', '📋 责任认定报告');
+                    html += `<div class="verdict-report">${reportText}</div>`;
+                }
+                if (data.winner) {
+                    const winnerName = data.winner === 'party_a' ? '消费者' : '商家';
+                    html += `<div class="liability-tag">
+                        <strong>📌 责任倾向：</strong> ${winnerName} 的责任倾向相对较低，诉求获得支持
+                    </div>`;
+                }
+            }
         }
-        // ── 渲染图表 ──
-        renderCharts(data);
+
+        reportBox.innerHTML = html;
     }
-    // ── ECharts 图表渲染 ──
-    function renderCharts(data) {
-        var labels = data.party_labels || { party_a: '甲方', party_b: '乙方' };
-        // 情绪柱状图
-        var emotionDom = document.getElementById('emotion-chart');
-        if (emotionChart) { emotionChart.dispose(); }
-        emotionChart = echarts.init(emotionDom);
-        emotionChart.setOption({
+
+    function renderCharts(emotionA, emotionB, faultA, faultB) {
+        // 情绪图
+        const emotionDom = document.getElementById('emotionChart');
+        if (!emotionChartInstance) {
+            emotionChartInstance = echarts.init(emotionDom);
+        }
+        emotionChartInstance.setOption({
             tooltip: { trigger: 'axis' },
-            grid: { left: '12%', right: '8%', top: '15%', bottom: '15%' },
+            grid: { left: 36, right: 16, top: 20, bottom: 28 },
             xAxis: {
                 type: 'category',
-                data: [labels.party_a, labels.party_b],
-                axisLabel: { fontSize: 12 }
+                data: ['消费者', '商家'],
+                axisLine: { show: false },
+                axisTick: { show: false }
             },
             yAxis: {
                 type: 'value',
                 max: 100,
-                name: '情绪值'
+                name: '情绪值',
+                splitLine: { lineStyle: { color: '#f0f0f0', type: 'dashed' } }
             },
             series: [{
                 type: 'bar',
                 data: [
-                    {
-                        value: data.emotion_intensity.party_a,
-                        itemStyle: { color: '#ff7875' }
-                    },
-                    {
-                        value: data.emotion_intensity.party_b,
-                        itemStyle: { color: '#69c0ff' }
-                    }
+                    { value: emotionA, itemStyle: { color: '#3498db', borderRadius: [6, 6, 0, 0] } },
+                    { value: emotionB, itemStyle: { color: '#e67e22', borderRadius: [6, 6, 0, 0] } }
                 ],
-                barWidth: '40%',
+                barWidth: 48,
                 label: {
                     show: true,
                     position: 'top',
-                    fontSize: 14,
-                    fontWeight: 'bold'
+                    fontWeight: 600,
+                    fontSize: 14
                 }
             }]
         });
-        // 责任权重仪表盘（双指针）
-        var faultDom = document.getElementById('fault-chart');
-        if (faultChart) { faultChart.dispose(); }
-        faultChart = echarts.init(faultDom);
-        faultChart.setOption({
-            series: [
-                {
-                    type: 'gauge',
-                    center: ['30%', '55%'],
-                    radius: '70%',
-                    startAngle: 200,
-                    endAngle: -20,
-                    min: 0,
-                    max: 100,
-                    title: { text: labels.party_a, offsetCenter: [0, '70%'], fontSize: 11 },
-                    detail: {
-                        valueAnimation: true,
-                        formatter: '{value}',
-                        offsetCenter: [0, '45%'],
-                        fontSize: 18
-                    },
-                    data: [{ value: data.fault_score.party_a }],
-                    axisLine: {
-                        lineStyle: {
-                            width: 12,
-                            color: [[0.3, '#52c41a'], [0.6, '#faad14'], [1, '#ff4d4f']]
-                        }
-                    },
-                    pointer: { width: 4, length: '60%' },
-                    axisTick: { show: false },
-                    splitLine: { show: false },
-                    axisLabel: { show: false }
-                },
-                {
-                    type: 'gauge',
-                    center: ['70%', '55%'],
-                    radius: '70%',
-                    startAngle: 200,
-                    endAngle: -20,
-                    min: 0,
-                    max: 100,
-                    title: { text: labels.party_b, offsetCenter: [0, '70%'], fontSize: 11 },
-                    detail: {
-                        valueAnimation: true,
-                        formatter: '{value}',
-                        offsetCenter: [0, '45%'],
-                        fontSize: 18
-                    },
-                    data: [{ value: data.fault_score.party_b }],
-                    axisLine: {
-                        lineStyle: {
-                            width: 12,
-                            color: [[0.3, '#52c41a'], [0.6, '#faad14'], [1, '#ff4d4f']]
-                        }
-                    },
-                    pointer: { width: 4, length: '60%' },
-                    axisTick: { show: false },
-                    splitLine: { show: false },
-                    axisLabel: { show: false }
+        emotionChartInstance.resize();
+
+        // 过错分图
+        const faultDom = document.getElementById('faultChart');
+        if (!faultChartInstance) {
+            faultChartInstance = echarts.init(faultDom);
+        }
+        faultChartInstance.setOption({
+            tooltip: { trigger: 'axis' },
+            grid: { left: 36, right: 16, top: 20, bottom: 28 },
+            xAxis: {
+                type: 'category',
+                data: ['消费者', '商家'],
+                axisLine: { show: false },
+                axisTick: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                max: 100,
+                name: '过错分（越高越理亏）',
+                splitLine: { lineStyle: { color: '#f0f0f0', type: 'dashed' } }
+            },
+            series: [{
+                type: 'bar',
+                data: [
+                    { value: faultA, itemStyle: { color: '#3498db', borderRadius: [6, 6, 0, 0] } },
+                    { value: faultB, itemStyle: { color: '#e67e22', borderRadius: [6, 6, 0, 0] } }
+                ],
+                barWidth: 48,
+                label: {
+                    show: true,
+                    position: 'top',
+                    fontWeight: 600,
+                    fontSize: 14
                 }
-            ]
+            }]
         });
-        // 响应式
-        window.addEventListener('resize', function () {
-            if (emotionChart) emotionChart.resize();
-            if (faultChart) faultChart.resize();
-        });
+        faultChartInstance.resize();
     }
-    function destroyCharts() {
-        if (emotionChart) { emotionChart.dispose(); emotionChart = null; }
-        if (faultChart) { faultChart.dispose(); faultChart = null; }
-    }
-    // ── 工具函数 ──
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-})();
+
+    window.addEventListener('resize', function() {
+        if (emotionChartInstance) emotionChartInstance.resize();
+        if (faultChartInstance) faultChartInstance.resize();
+    });
     </script>
 </body>
 </html>
